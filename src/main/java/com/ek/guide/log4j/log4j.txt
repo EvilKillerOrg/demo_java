@@ -1,0 +1,181 @@
+						Log4j
+	
+	1.什么是Log4j (What)
+		Log4j是Apache的一个开放源代码项目，通过使用Log4j，我们可以控制日志信息输送的 目的地是控制台、文件、GUI组件、甚至是套接口服务器、
+	NT的事件记录器、UNIX Syslog 守护进程等；我们也可以控制每一条日志的输出格式；通过定义每一条日志信息的级别
+		组成：logging-log4j 包
+			 log4j.properties的属性配置文件
+	
+	
+	
+	2.为什么要使用Log4j  (Why)
+		研究发现，一个系统中4%的代码是用来作日志处理或者是调试时使用的。
+	
+		在log4j中，log信息通过存放器输出到目的地。支持的存放器有console, files, GUI components, remote socket servers, JMS。
+	通过file存放器，log信息可以被输出到不同的文件中（即不同的目的地）。
+		程序员可以自由定义级别。 DEBUG, INFO, WARN, ERROR ，FATAL几种级别，与方法绑定。
+	如果一条log信息的级别，大于等于记录器的级别值，那么记录器就会记录它。 DEBUG < INFO < WARN < ERROR < FATAL. 
+	下面是Logger类的基本方法。 
+	package org.apache.log4j; 
+	public class Logger {
+
+		// Creation & retrieval methods:
+		public static Logger getRootLogger();
+		public static Logger getLogger(String name);
+
+		// printing methods:
+		public void debug(Object message);
+		public void info(Object message);
+		public void warn(Object message);
+		public void error(Object message);
+		public void fatal(Object message);
+
+		// generic printing method:
+		public void log(Level l, Object message);
+	}
+	
+	
+	
+	
+		 
+		
+    3.怎样使用Log4j (How)
+    
+    	(1)、log4j有三种主要的组件：记录器,存放器,布局
+		(2)、记录器（记录器可不关心log数据存放的位置或类型）
+　　			log4j允许程序员定义多个记录器，每个记录器有自己的名字，记录器之间通过名字来表明隶属关系（或家族关系）。列如，记录器a.b,
+			与记录器a.b.c之间是父子关系，而记录器a与a.b.c之间是祖先与后代的关系，父子关系是祖先与后代关系的特例。通过这种关系，
+			可以描述不同记录器之间的逻辑关系。有一个记录器叫根记录器，它永远存在，且不能通过名字检索或引用，可以通过
+			Logger.getRootLogger()方法取得它，而一般记录器通过Logger.getLogger(String name)方法。
+		下面是Logger类的基本方法。
+		public class Logger {
+
+		// Creation & retrieval methods:
+		public static Logger getRootLogger();
+		public static Logger getLogger(String name);
+
+		// printing methods:
+		public void debug(Object message);
+		public void info(Object message);
+		public void warn(Object message);
+		public void error(Object message);
+		public void fatal(Object message);
+
+		// generic printing method:
+		public void log(Level l, Object message);
+	}
+			有几个有趣的情况，一是当一个记录器实例化后，再一次用相同的名字调用getLogger()会返回对它的引用，这非常有利于用同一个记录器在
+		不同代码或类中记录log信息，另一个是与自然界中祖先先于后代出现不同，一个记录器的祖先可以比后代记录出现的晚，但会自动根据名字之间的
+		关系建立这种家族关系。 
+			记录器还有一个重要的属性，就是级别。（这好理解，就象一个家庭中，成员间存在辈份关系，但不同的成员的身高可能不一样，且身高与辈份无关）
+			程序员可以给不同的记录器赋以不同的级别，如果某个成员没有被明确值，就自动继承最近的一个有级别长辈的级别值。根记录器总有级别值。例如：
+		录器名 	赋予的级别值	 继承的级别值 
+		root 		Proot 			Proot 
+		X  			Px  			Px  
+		X.Y  		none  			Px  
+		X.Y.Z 		none   			Px 
+			程序员可以自由定义级别。级别值之间存在偏序关系，如上面几种级别就有关系DEBUG 　　每一条要输出的log信息，也有一个级别值。
+　　		前面的Logger类中，就预定义了 DEBUG, INFO, WARN, ERROR ，FATAL几种级别，由于与方法绑定，让人易产生误解，其实这几个方法只不过表明
+		了要记录的log信息的级别。当调用log()方法时，log信息的级别就需要在通过参数明确指定。如果一条log信息的级别，大于等于记录器的级别值，
+		那么记录器就会记录它。
+
+			有几个有趣的情况，一是当一个记录器实例化后，再一次用相同的名字调用getLogger()会返回对它的引用，这非常有利于用同一个记录器在
+		不同代码或类中记录log信息，另一个是与自然界中祖先先于后代出现不同，一个记录器的祖先可以比后代记录出现的晚，但会自动根据名字之间
+		的关系建立这种家族关系。 
+
+	4、存放器	
+　　		一个记录器可以有多个存放器，可以通过方法addAppender来增加存放器。一条blog信息如果可被这个记录器处理，则记录器会把这条信息送往
+	每个它所拥有的存放器。每个记录器有一个继承开关,其开关决定记录器是/否继承其父记录器的存放器，注意，如果继承则只继承其父记录器,
+	而不考虑更远的祖先的情况。参考下表：
+	记录器 			增加的存放器 			继承的存放器			 输出的目的地 					备注 
+	root 			A1 					not applicable 			A1 				The root logger is anonymous but can be accessed with the Logger.
+																				getRootLogger() method. There is no default appender attached to root.
+	x 				A-x1, A-x2 			TRUE 				A1, A-x1, A-x2 		Appenders of "x" and root. 
+	x.y 			none 				TRUE 				A1, A-x1, A-x2 		Appenders of "x" and root. 
+	x.y.z 			A-xyz1 				TRUE 				A1, A-x1, A-x2
+																, A-xyz1 		Appenders in "x.y.z", "x" and root. 
+	security 		A-sec 				FALSE 				A-sec 				No appender accumulation since the additivity flag is set to false. 
+	security.access none 				TRUE 				A-sec 				Only appenders of "security" because the additivity flag 
+																					in "security" is set to false. 
+	5、布局
+　　		布局负责格式化输出的log信息。log4j的PatternLayout可以让程序以类似C语言printf的格式化模板来定义格式。
+
+	6、log4j可据程序员制定的标准自动提供一些log信息，这对那类需要频繁log的对象的情况很帮助。对象的自动log，具有继承性。
+
+	
+	****log4j.properties的属性配置文件
+	
+	# Set root logger level to DEBUG and its only appender to A1 
+	#log4j中有五级logger 
+	#FATAL 0 
+	#ERROR 3 
+	#WARN 4 
+	#INFO 6 
+	#DEBUG 7 
+	#***************配置根Logger，其语法为：*****************************************
+	#log4j.rootLogger = [ level ] , appenderName, appenderName, …
+	#log4j.rootLogger = [ 级别 ] , 存放器名称, 存放器名称, …
+	#level 是日志记录的优先级
+	#appenderName就是指定日志信息输出到哪个地方。您可以同时指定多个输出目的地。 
+	log4j.rootLogger=INFO, A1 ,R
+	#这一句设置以为着所有的log都输出
+	#如果为log4j.rootLogger=WARN, 则意味着只有WARN,ERROR,FATAL被输出，DEBUG,INFO将被屏蔽掉.
+	#*******************************************************************************
+	
+	#**************配置存放器的位置，其语法为：*****************************************
+	#log4j中Appender有几层如控制台、文件、GUI组件等
+	#org.apache.log4j.ConsoleAppender（控制台），
+	#org.apache.log4j.FileAppender（文件），
+	#org.apache.log4j.DailyRollingFileAppender（每天产生一个日志文件），
+	#org.apache.log4j.RollingFileAppender（文件大小到达指定尺寸的时候产生一个新的文件），
+	#org.apache.log4j.WriterAppender（将日志信息以流格式发送到任意指定的地方） 
+	log4j.appender.A1=org.apache.log4j.ConsoleAppender 
+	#log4j.appender.R=org.apache.log4j.DailyRollingFileAppender
+	#*******************************************************************************
+	
+	
+	#**************配置布局，其语法为：*****************************************
+	Log4j提供的appender有以下几种：
+
+	# A1 使用的输出布局，其中log4j提供4种布局.
+	#配置日志信息的格式（布局），其语法为：
+	#log4j.appender.appenderName.layout = fully.qualified.name.of.layout.class
+	#log4j.appender.appenderName.layout.option1 = value1
+	....
+	#log4j.appender.appenderName.layout.option = valueN
+	#org.apache.log4j.HTMLLayout（以HTML表格形式布局）
+	#org.apache.log4j.PatternLayout（可以灵活地指定布局模式），
+	#org.apache.log4j.SimpleLayout（包含日志信息的级别和信息字符串），
+	#org.apache.log4j.TTCCLayout（包含日志产生的时间、线程、类别等等信息） 
+
+	log4j.appender.A1.layout=org.apache.log4j.PatternLayout 
+	#灵活定义输出格式 具体查看log4j javadoc org.apache.log4j.PatternLayout 
+	
+	# Note the %x conversion specifier for NDC printing.
+	# %d date time
+	# %-5p debug level
+	# %m messages
+	# %l class with method and line number (slowly! dubug only, on release use %c{2} in release version)
+	# %n \n or \r\n
+	
+	#d 时间 .... 
+	log4j.appender.A1.layout.ConversionPattern=%-d{yyyy-MM-dd HH:mm:ss} [%c]-[%p] %m%n 
+	
+	
+	#R 输出到文件 RollingFileAppender的扩展，可以提供一种日志的备份功能。
+	log4j.appender.R=org.apache.log4j.RollingFileAppender 
+	#日志文件的名称
+	log4j.appender.R.File=log4j.log 
+	#日志文件的大小
+	log4j.appender.R.MaxFileSize=100KB 
+	# 保存一个备份文件
+	log4j.appender.R.MaxBackupIndex=1 
+
+	log4j.appender.R.layout=org.apache.log4j.TTCCLayout
+	#log4j.appender.R.layout.ConversionPattern=%-d{yyyy-MM-dd HH:mm:ss} [%c]-[%p] %m%n
+	#*******************************************************************************
+	
+	
+	
+	
+	

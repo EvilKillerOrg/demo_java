@@ -1,0 +1,125 @@
+一：介绍
+      log4j是jakarta的一个项目主要是为了调试使用的，log4j的好处在于：
+           通过修改配置文件，就可以决定log信息输出到何处(console,文件,...),是否输出。这样，
+      在系统开发阶段可以打印详细的log信息以跟踪系统运行情况,而在系统稳定后可以关闭log输出,
+      从而在能跟踪系统运行情况的同时,又减少了垃圾代码(System.out.println(...)等)。
+   
+二：基础
+      (1) log4j有三种主要的组件：记录器,存放器,布局
+        a.  log4j允许程序员定义多个记录器，每个记录器有自己的名字，记录器之间通过名字来表明隶属关系
+          （或家族关系）。列如，记录器a.b,与记录器a.b.c之间是父子关系，而记录器a与a.b.c之间是祖先
+          与后代的关系，父子关系是祖先与后代关系的特例。通过这种关系，可以描述不同记录器之间的逻辑关系。
+               有一个记录器叫根记录器，它永远存在，且不能通过名字检索或引用，可以通过Logger.getRootLogger()
+          方法取得它，而一般记录器通过Logger.getLogger(String name)方法。
+       下面是Logger类的基本方法。
+       package org.apache.log4j;
+
+      public class Logger {
+
+        // Creation & retrieval methods:
+            public static Logger getRootLogger();
+             public static Logger getLogger(String name);
+
+        // printing methods:
+             public void debug(Object message);
+             public void info(Object message);
+             public void warn(Object message);
+             public void error(Object message);
+             public void fatal(Object message);
+
+       // generic printing method:
+             public void log(Level l, Object message);
+        }
+            记录器还有一个重要的属性，就是级别。（这好理解，就象一个家庭中，成员间存在辈份关系，
+       但不同的成员的身高可能不一样，且身高与辈份无关）程序员可以给不同的记录器赋以不同的级别，
+       如果某个成员没有被明确值，就自动继承最近的一个有级别长辈的级别值。根记录器总有级别值。 
+        
+         记录器名  赋予的级别值  继承的级别值 
+        root     Proot      Proot 
+          X       Px         Px  
+          X.Y     none       Px  
+          X.Y.Z   none       Px  
+          
+       Logger类中，就预定义了 DEBUG, INFO, WARN, ERROR ，FATAL几种级别
+		
+      b. 存放器
+           log信息通过存放器输出到目的地。支持的存放器有console, files, GUI components, 
+       remote socket servers等。
+           一个记录器可以有多个存放器，可以通过方法addAppender来增加存放器。一条blog信息如果可被这个记录器处理，
+        则记录器会把这条信息送往每个它所拥有的存放器。
+      
+      c、布局
+　　     布局负责格式化输出的log信息。log4j的PatternLayout可以让程序以类似C语言printf的格式化模板来定义格式。
+      
+      
+      log4j.properties
+      
+      # Set root logger level to DEBUG and its only appender to A1 
+      #log4j中有五级logger 
+      #FATAL 0 
+      #ERROR 3 
+      #WARN 4 
+	  #INFO 6 
+      #DEBUG 7 
+      #配置根Logger，其语法为：
+      #log4j.rootLogger = [ level ] , appenderName, appenderName, …
+      log4j.rootLogger=INFO, A1 ,R
+      #这一句设置以为着所有的log都输出
+      #如果为log4j.rootLogger=WARN, 则意味着只有WARN,ERROR,FATAL
+      #被输出，DEBUG,INFO将被屏蔽掉.
+      # A1 is set to be a ConsoleAppender. 
+      #log4j中Appender有几层如控制台、文件、GUI组件、甚至是套接口服务器、NT的事件记录器、UNIX Syslog守护进程等
+      #ConsoleAppender输出到控制台 
+      log4j.appender.A1=org.apache.log4j.ConsoleAppender 
+      # A1 使用的输出布局，其中log4j提供4种布局. 
+      #org.apache.log4j.HTMLLayout（以HTML表格形式布局）
+      #org.apache.log4j.PatternLayout（可以灵活地指定布局模式），
+      #org.apache.log4j.SimpleLayout（包含日志信息的级别和信息字符串），
+      #org.apache.log4j.TTCCLayout（包含日志产生的时间、线程、类别等等信息）
+
+      log4j.appender.A1.layout=org.apache.log4j.PatternLayout 
+      #灵活定义输出格式 具体查看log4j javadoc org.apache.log4j.PatternLayout 
+      #d 时间 .... 
+      log4j.appender.A1.layout.ConversionPattern=%-d{yyyy-MM-dd HH:mm:ss} [%c]-[%p] %m%n 
+      #R 输出到文件 RollingFileAppender的扩展，可以提供一种日志的备份功能。
+      log4j.appender.R=org.apache.log4j.RollingFileAppender 
+      #日志文件的名称
+      log4j.appender.R.File=log4j.log 
+      #日志文件的大小
+      log4j.appender.R.MaxFileSize=100KB 
+      # 保存一个备份文件
+      log4j.appender.R.MaxBackupIndex=1 
+
+      log4j.appender.R.layout=org.apache.log4j.TTCCLayout
+      #log4j.appender.R.layout.ConversionPattern=%-d{yyyy-MM-dd HH:mm:ss} [%c]-[%p] %m%n
+      
+      
+      
+      
+      Log4j提供的appender有以下几种：
+        org.apache.log4j.ConsoleAppender（控制台），
+         org.apache.log4j.FileAppender（文件），
+        org.apache.log4j.DailyRollingFileAppender（每天产生一个日志文件），
+        org.apache.log4j.RollingFileAppender（文件大小到达指定尺寸的时候产生一个新的文件），
+        org.apache.log4j.WriterAppender（将日志信息以流格式发送到任意指定的地方）
+
+        配置日志信息的格式（布局），其语法为：
+       log4j.appender.appenderName.layout = fully.qualified.name.of.layout.class
+       log4j.appender.appenderName.layout.option1 = value1
+        ....
+       log4j.appender.appenderName.layout.option = valueN
+
+       Log4j提供的layout有以下几种：
+         org.apache.log4j.HTMLLayout（以HTML表格形式布局），
+         org.apache.log4j.PatternLayout（可以灵活地指定布局模式），
+         org.apache.log4j.SimpleLayout（包含日志信息的级别和信息字符串），
+         org.apache.log4j.TTCCLayout（包含日志产生的时间、线程、类别等等信息）
+         
+         %p 输出优先级，即DEBUG，INFO，WARN，ERROR，FATAL 
+　　       %r 输出自应用启动到输出该log信息耗费的毫秒数 
+　      　%c 输出所属的类目，通常就是所在类的全名 
+　　      %t 输出产生该日志事件的线程名 
+　　      %n 输出一个回车换行符，Windows平台为“\r\n”，Unix平台为“\n” 
+　　      %d 输出日志时间点的日期或时间，默认格式为ISO8601，也可以在其后指定格式，比如：%d{yyy MMM dd HH:mm:ss,SSS}，输出类似：2002年10月18日 22：10：28，921 
+　　      %l 输出日志事件的发生位置，包括类目名、发生的线程，以及在代码中的行数。举例：Testlog4.main(TestLog4.java:10) 
+         

@@ -1,0 +1,15 @@
+1.网络: 局域网 城域网 互联网
+2.地址: IP地址 
+3.端口: 区分计算机软件的 2字节 0-65535 65536个 在同一个协议下不能重复 不同协议可以重复 1024以下预留给大长了 不要使用
+4.资源定位: URL统一资源定位符 URI统一资源
+5.数据的传输: 
+ 协议: TCP(面向连接,先连接后通讯,三次握手,安全可高,效率相对低下) 和 UDP(非面向连接,效率相对高)
+ 传输: 先封装 后拆封
+ 
+ ==>类
+ 1. InetAddress(IP和DNS,地址和域名解析) InetASocketddress(端口)
+ 2. URL
+ 3. TCP: ServerSocket Socket 
+ 4. UDP: DatagramSocket DatagramPacket
+
+ 底层还是流  IO  

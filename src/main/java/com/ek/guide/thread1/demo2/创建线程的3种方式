@@ -1,0 +1,4 @@
+Test1  继承Thread 创建线程
+Test2  实现Runnable的方式创建线程
+Test3  实现Runnable的方式创建线程  (多一个例子)
+Test4  实现Callable的方式创建线程
