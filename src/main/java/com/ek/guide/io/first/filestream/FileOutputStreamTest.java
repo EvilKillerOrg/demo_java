@@ -1,4 +1,4 @@
-package com.ek.guide.io.filestream;
+package com.ek.guide.io.first.filestream;
 
 import java.io.File;
 import java.io.FileNotFoundException;

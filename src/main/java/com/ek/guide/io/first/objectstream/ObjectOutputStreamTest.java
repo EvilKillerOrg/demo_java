@@ -1,4 +1,4 @@
-package com.ek.guide.io.objectstream;
+package com.ek.guide.io.first.objectstream;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -6,7 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import com.ek.guide.io.objectstream.util.Employee;
+import com.ek.guide.io.first.objectstream.util.Employee;
 
 public class ObjectOutputStreamTest {
 

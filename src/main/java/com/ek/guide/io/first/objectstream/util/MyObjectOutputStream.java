@@ -1,4 +1,4 @@
-package com.ek.guide.io.objectstream.util;
+package com.ek.guide.io.first.objectstream.util;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;

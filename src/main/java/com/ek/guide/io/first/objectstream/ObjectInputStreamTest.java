@@ -1,4 +1,4 @@
-package com.ek.guide.io.objectstream;
+package com.ek.guide.io.first.objectstream;
 
 import java.io.EOFException;
 import java.io.File;
@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
-import com.ek.guide.io.objectstream.util.Employee;
+import com.ek.guide.io.first.objectstream.util.Employee;
 
  
 
