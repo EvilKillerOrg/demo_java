@@ -3,7 +3,8 @@ package com.ek.guide.socket.demo1;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 /**
- * InetAddress 封装IP和DNS
+ * IP
+ * InetAddress 封装IP地址和DNS(域名解析), 没有封装端口 
  */
 public class Test1 {
 	public static void main(String[] args) throws UnknownHostException {
